@@ -1,23 +1,66 @@
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
+import { useAuth } from './hooks/useAuth'
+import ProtectedRoute from './components/ProtectedRoute'
+import SimpleDashboardPage from './pages/SimpleDashboardPage'
+
+
+// const DashboardPage = () => {
+//   const { user } = useAuth();
+
+//   return (
+//     <div>
+//       <h1>Dashboard</h1>
+//       <h1>{user.name}</h1>
+//       <h1>{user.email}</h1>
+//       <h1>{user.role}</h1>
+//       <Outlet />
+//     </div>
+//   )
+// }
+const HomePage = () => <h1>Home Page</h1>
+const UsersPage = () => <h1>Users Page</h1>
+const ProductsPage = () => <h1>Product Page</h1>
+const TransactionsPage = () => <h1>Transactions Page</h1>
+const CounterPage = () => <h1>Counter Page</h1>
+
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Outlet />,
+    element:
+      <ProtectedRoute>
+        <Outlet />
+      </ProtectedRoute>,
     children: [
       {
-        path: "dashboard",
-        element: <div><h1>Dashboard</h1><Outlet />,</div>,
+        path: "",
+        element: <Navigate to={"dashboard"} />
+      },
+      {
+        path: "/dashboard",
+        element: <SimpleDashboardPage />,
         children: [
           {
             path: "",
-            element: <h1>Welcome to Home Dashboard</h1>
+            element: <HomePage />
           },
           {
             path: "users",
-            element: <h1>User List</h1>
-          }
+            element: <UsersPage />
+          },
+          {
+            path: "products",
+            element: <ProductsPage />
+          },
+          {
+            path: "transactions",
+            element: <TransactionsPage />
+          },
+          {
+            path: "counter",
+            element: <CounterPage />
+          },
         ]
       },
     ]

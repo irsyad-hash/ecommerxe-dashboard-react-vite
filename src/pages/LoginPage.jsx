@@ -1,10 +1,31 @@
 import PageTitle from "../components/PageTitle";
 import enigmaGrowLogo from "../assets/enigma_grow.png";
-import { useState } from "react";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
+const schema = z.object({
+    username: z.string().min(1, { message: "Username is required" }),
+    password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
+})
 
 function LoginPage() {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const {login} = useAuth()
+    const navigate = useNavigate();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(schema)
+    });
+
+    const onSubmit = (data) => {
+        login(data.username, data.password)
+        navigate("/dashboard")
+    };
 
     return (
         <div className="flex min-h-screen flex-1 flex-col justify-center items-center py-12 sm:px-6 bg-background-gray lg:px-8">
@@ -25,14 +46,8 @@ function LoginPage() {
             {/* Container for Login Form */}
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
                 <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
-                    <form className="space-y-6" onSubmit={(e) => {
-                            e.preventDefault();
-                            console.log("username password", {
-                                username: document.getElementById("username").value,
-                                password: document.getElementById("password").value,
-                            });
-                        }}>
-                            
+                    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+
                         {/* Username Input */}
                         <div>
                             <label
@@ -44,20 +59,19 @@ function LoginPage() {
                             </label>
                             <div className="mt-2">
                                 <input
-                                    id="username"
-                                    name="username"
                                     type="text"
                                     autoComplete="username"
-                                    required
                                     className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-insert
                              ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primar sm:text-sm sm:leading-6"
                                     placeholder="Username"
-                                    value={username}
-                                    onChange={(e) => {
-                                        setUsername(e.target.value)
-                                    }
-                                    }
+                                    {...register("username")}
                                 />
+                                {errors?.username?.message && (
+
+                                    <p className="mt-2 text-sm font-medium">
+                                        {errors.username?.message}
+                                    </p>
+                                )}
                             </div>
                         </div>
 
@@ -71,19 +85,19 @@ function LoginPage() {
                             </label>
                             <div className="mt-2">
                                 <input
-                                    id="password"
-                                    name="password"
+                                    {...register("password")}
                                     type="password"
                                     autoComplete="current-password"
-                                    required
                                     className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-insert
                              ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primar sm:text-sm sm:leading-6"
                                     placeholder="Password"
-                                    value={password}
-                                    onChange={(e) => {
-                                        setPassword(e.target.value)
-                                    }}
                                 />
+                                {errors?.password?.message && (
+
+                                    <p className="mt-2 text-sm font-medium">
+                                        {errors.password?.message}
+                                    </p>
+                                )}
                             </div>
                         </div>
 
